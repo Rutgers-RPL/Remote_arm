@@ -28,7 +28,7 @@ void loop() {
       if (command == "ARM") {
         arm_rocket();
         SerialBT.println("ROCKET_ARMED");
-      } else if (command == "DISAEM") {
+      } else if (command == "DISARM") {
         disarm_rocket();
         SerialBT.println("ROCKET_DISARMED");
       } else {
