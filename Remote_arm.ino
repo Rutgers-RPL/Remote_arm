@@ -1,10 +1,7 @@
 #include "BluetoothSerial.h"
 
-#define ARM_COMMAND "ARM"
-#define UNARM_COMMAND "UNARM"
-
 #define PIN_ONE 1
-#define PIN_TWO 2
+#define PIN_TWO 10
 #define PIN_THREE 3
 #define PIN_FOUR 4
 
@@ -15,24 +12,31 @@ void setup() {
   pinMode(PIN_TWO, OUTPUT);
   pinMode(PIN_THREE, OUTPUT);
   pinMode(PIN_FOUR, OUTPUT);
+  pinMode(LED_BUILTIN, OUTPUT);
 
   SerialBT.begin("RRPL Rocket");
 }
 
 void loop() {
-  if (SerialBT.hasClient() && SerialBT.available()) {
-    String command = SerialBT.readStringUntil('\n');
-    command.trim();
+  if (SerialBT.hasClient()) {
+    digitalWrite(LED_BUILTIN, HIGH);
 
-    if (command == ARM_COMMAND) {
-      arm_rocket();
-      SerialBT.println("ROCKET_ARMED")
-    } else if (command == UNARM_COMMAND) {
-      unarm_rocket();
-      SerialBT.println("ROCKET_UNARMED")
-    } else {
-      SerialBT.print("UNKNOWN_COMMAND");
+    if (SerialBT.available()) {
+      String command = SerialBT.readStringUntil('\n');
+      command.trim();
+
+      if (command == "ARM") {
+        arm_rocket();
+        SerialBT.println("ROCKET_ARMED");
+      } else if (command == "DISAEM") {
+        disarm_rocket();
+        SerialBT.println("ROCKET_DISARMED");
+      } else {
+        SerialBT.print("UNKNOWN_COMMAND");
+      }
     }
+  } else {
+    digitalWrite(LED_BUILTIN, LOW);
   }
 }
 
@@ -43,7 +47,7 @@ void arm_rocket() {
   digitalWrite(PIN_FOUR, HIGH);
 }
 
-void unarm_rocket() {
+void disarm_rocket() {
   digitalWrite(PIN_ONE, LOW);
   digitalWrite(PIN_TWO, LOW);
   digitalWrite(PIN_THREE, LOW);
