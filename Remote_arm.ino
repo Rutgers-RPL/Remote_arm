@@ -25,32 +25,44 @@ void loop() {
       String command = SerialBT.readStringUntil('\n');
       command.trim();
 
-      if (command == "ARM") {
-        arm_rocket();
-        SerialBT.println("ROCKET_ARMED");
-      } else if (command == "DISARM") {
-        disarm_rocket();
-        SerialBT.println("ROCKET_DISARMED");
-      } else {
-        SerialBT.print("UNKNOWN_COMMAND");
+      switch (command) {
+        case "ARM_1":
+          digitalWrite(PIN_ONE, HIGH);
+          SerialBT.print("ARMED_1");
+          break;
+        case "ARM_2":
+          digitalWrite(PIN_TWO, HIGH);
+          SerialBT.print("ARMED_2");
+          break;
+        case "ARM_3":
+          digitalWrite(PIN_THREE, HIGH);
+          SerialBT.print("ARMED_3");
+          break;
+        case "ARM_4":
+          digitalWrite(PIN_FOUR, HIGH);
+          SerialBT.print("ARMED_4");
+          break;
+        case "DISARM_1":
+          digitalWrite(PIN_ONE, LOW);
+          SerialBT.print("DISARMED_1");
+          break;
+        case "DISARM_2":
+          digitalWrite(PIN_TWO, LOW);
+            SerialBT.print("DISARMED_2");
+          break;
+        case "DISARM_3":
+          digitalWrite(PIN_THREE, LOW);
+          SerialBT.print("DISARMED_3");
+          break;
+        case "DISARM_4":
+          digitalWrite(PIN_FOUR, LOW);
+          SerialBT.print("DISARMED_4");
+          break;
+        default:
+          SerialBT.print("UNKNOWN_COMMAND");
       }
     }
   } else {
     digitalWrite(LED_BUILTIN, LOW);
   }
 }
-
-void arm_rocket() {
-  digitalWrite(PIN_ONE, HIGH);
-  digitalWrite(PIN_TWO, HIGH);
-  digitalWrite(PIN_THREE, HIGH);
-  digitalWrite(PIN_FOUR, HIGH);
-}
-
-void disarm_rocket() {
-  digitalWrite(PIN_ONE, LOW);
-  digitalWrite(PIN_TWO, LOW);
-  digitalWrite(PIN_THREE, LOW);
-  digitalWrite(PIN_FOUR, LOW);
-}
-
