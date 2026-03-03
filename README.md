@@ -20,3 +20,7 @@ After following the above steps, there shouldn't be any issue with deploying the
 ### MAC Addresses
 
 To communicate with the ignition bay and nose cone boards using ESP-NOW, the MAC addresses of these boards must be known. A board's MAC address can be found using the "get_mac_address" sketch, which will print that board's MAC address in normal text as well as in a hex array.
+
+### USB to UART Driver
+
+If you encounter issues with uploading code, consider installing the [USB to UART Driver](https://www.silabs.com/software-and-tools/usb-to-uart-bridge-vcp-drivers). This will likely solve your problem if it is the result of a "pySerial" error.
