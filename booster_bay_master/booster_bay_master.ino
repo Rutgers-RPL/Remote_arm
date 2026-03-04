@@ -20,8 +20,8 @@
 #define ATTEMPT_MAX_ATTEMPTS 5
 #define ATTEMPT_INTERVAL 500
 
-const uint8_t ignition_bay_mac_addr[6] = {}; // TODO: Get mac addr
-const uint8_t nose_cone_mac_addr[6] = {}; // TODO: Get mac addr
+const uint8_t ignition_bay_mac_addr[6] = {0x58, 0xBF, 0x25, 0x37, 0x47, 0xB0};
+const uint8_t nose_cone_mac_addr[6] = {0x58, 0xBF, 0x25, 0x37, 0x41, 0x7C};
 
 esp_now_peer_info_t ignition_bay_peer_info = {
   .channel = 0,
