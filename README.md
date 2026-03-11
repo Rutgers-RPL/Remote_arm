@@ -2,6 +2,10 @@
 
 Monorepo for the ESP32-based remote arming system. Uses an ESP32 as a master device to receive commands over BLE and, if needed, relay commands to two other ESP32s using ESP-NOW.
 
+## NOTE
+
+The "single_board" project is currently the most updated project here since it is the one actually being used. Ignore the information about the partition scheme and MAC Addresses when using the "single_board" project. The information about the USB to UART driver might still apply depending on your situation.
+
 ## Required Packages
 
 In the Boards Manager, install the "esp32" boards package by "Espressif Systems" in Arduino IDE to deploy this.
