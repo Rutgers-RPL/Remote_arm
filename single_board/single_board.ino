@@ -29,8 +29,8 @@ void init_pins() {
 }
 
 void handle_pin_toggle(String val) {
-  String action = val.substring(5);
   char pin = val[3];
+  String action = val.substring(5);
   uint8_t pin_mode;
 
   if (action == "ARM") {
@@ -78,6 +78,18 @@ class WriteCharCallbacks : public BLECharacteristicCallbacks {
   }
 };
 
+class ServerCallbacks : public BLEServerCallbacks {
+  void onConnect(BLEServer* server) {
+    delay(500);
+    notify_char->setValue("DISARMED");
+    notify_char->notify();
+  }
+
+  void onDisconnect(BLEServer* server) {
+    BLEDevice::startAdvertising();
+  }
+};
+
 void setup() {
   init_pins();
 
@@ -87,9 +99,10 @@ void setup() {
 
   BLEServer* server = BLEDevice::createServer();
   BLEService* service = server->createService(SERVICE_UUID);
+  server->setCallbacks(new ServerCallbacks());
   
   write_char = service->createCharacteristic(WRITE_CHARACTERISTIC_UUID, BLECharacteristic::PROPERTY_WRITE);
-  notify_char = service->createCharacteristic(NOTIFY_CHARACTERISTIC_UUID, BLECharacteristic::PROPERTY_READ | BLECharacteristic::PROPERTY_NOTIFY | BLECharacteristic::PROPERTY_INDICATE);
+  notify_char = service->createCharacteristic(NOTIFY_CHARACTERISTIC_UUID, BLECharacteristic::PROPERTY_READ | BLECharacteristic::PROPERTY_NOTIFY);
  
   write_char->setCallbacks(new WriteCharCallbacks());
   notify_char->addDescriptor(new BLE2902());
@@ -102,10 +115,6 @@ void setup() {
   advertising->setMinPreferred(0x06);
   advertising->setMaxPreferred(0x12);
   BLEDevice::startAdvertising();
-
-  notify_char->setValue("DISARMED");
-  delay(10);
-  notify_char->notify();
 }
 
 void loop() {
