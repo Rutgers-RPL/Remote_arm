@@ -8,35 +8,29 @@
 #define WRITE_CHARACTERISTIC_UUID "beb5483e-36e1-4688-b7f5-ea07361b26a8"
 #define NOTIFY_CHARACTERISTIC_UUID "498c599b-ad01-4148-8a6a-73c332854747"
 
-#define CHANNEL_1 1
-#define CHANNEL_2 2
-#define CHANNEL_3 3
-#define CHANNEL_4 4
-#define CHANNEL_5 5 
-#define CHANNEL_6 6
+#define CHANNEL_1 14
+#define CHANNEL_2 25
+#define CHANNEL_3 26
+#define CHANNEL_4 27
 
 BLECharacteristic* write_char;
 BLECharacteristic* notify_char;
 
-// void init_pins() {
-//   pinMode(CHANNEL_1, OUTPUT);
-//   pinMode(CHANNEL_2, OUTPUT);
-//   pinMode(CHANNEL_3, OUTPUT);
-//   pinMode(CHANNEL_4, OUTPUT);
-//   pinMode(CHANNEL_5, OUTPUT);
-//   pinMode(CHANNEL_6, OUTPUT);
+void init_pins() {
+  pinMode(CHANNEL_1, OUTPUT);
+  pinMode(CHANNEL_2, OUTPUT);
+  pinMode(CHANNEL_3, OUTPUT);
+  pinMode(CHANNEL_4, OUTPUT);
 
-//   digitalWrite(CHANNEL_1, LOW);
-//   digitalWrite(CHANNEL_2, LOW);
-//   digitalWrite(CHANNEL_3, LOW);
-//   digitalWrite(CHANNEL_4, LOW);
-//   digitalWrite(CHANNEL_5, LOW);
-//   digitalWrite(CHANNEL_6, LOW);
-// }
+  digitalWrite(CHANNEL_1, LOW);
+  digitalWrite(CHANNEL_2, LOW);
+  digitalWrite(CHANNEL_3, LOW);
+  digitalWrite(CHANNEL_4, LOW);
+}
 
 void handle_pin_toggle(String val) {
-  String action = val.substring(7);
-  char pin = val[5];
+  String action = val.substring(5);
+  char pin = val[3];
   uint8_t pin_mode;
 
   if (action == "ARM") {
@@ -60,23 +54,21 @@ void handle_pin_toggle(String val) {
     case '4':
       digitalWrite(CHANNEL_4, pin_mode);
       break;
-    case '5':
-      digitalWrite(CHANNEL_5, pin_mode);
-      break;
-    case '6':
-      digitalWrite(CHANNEL_6, pin_mode);
-      break;
     default:
       break;
   }
 
-  notify_char->setValue("B0_" + String(pin) + "_" + action + "ED");
+  String msg = "B0_" + String(pin) + "_" + action + "ED";
+  notify_char->setValue(msg.c_str());
+  delay(10);
   notify_char->notify();
 }
 
 class WriteCharCallbacks : public BLECharacteristicCallbacks {
   void onWrite(BLECharacteristic* characteristic) {
     String val = characteristic->getValue();
+
+    Serial.println(val);
 
     if (val.length() < 2) return;
 
@@ -87,20 +79,20 @@ class WriteCharCallbacks : public BLECharacteristicCallbacks {
 };
 
 void setup() {
-  // init_pins();
+  init_pins();
+
+  Serial.begin(115200);
 
   BLEDevice::init("RRPL Rocket");
 
   BLEServer* server = BLEDevice::createServer();
   BLEService* service = server->createService(SERVICE_UUID);
   
-  write_char = service->createCharacteristic(WRITE_CHARACTERISTIC_UUID,BLECharacteristic::PROPERTY_WRITE);
-  notify_char = service->createCharacteristic(NOTIFY_CHARACTERISTIC_UUID,BLECharacteristic::PROPERTY_READ | BLECharacteristic::PROPERTY_NOTIFY);
+  write_char = service->createCharacteristic(WRITE_CHARACTERISTIC_UUID, BLECharacteristic::PROPERTY_WRITE);
+  notify_char = service->createCharacteristic(NOTIFY_CHARACTERISTIC_UUID, BLECharacteristic::PROPERTY_READ | BLECharacteristic::PROPERTY_NOTIFY | BLECharacteristic::PROPERTY_INDICATE);
  
   write_char->setCallbacks(new WriteCharCallbacks());
   notify_char->addDescriptor(new BLE2902());
-
-  notify_char->setValue("B0_CONNECTED");
 
   service->start();
 
@@ -110,6 +102,10 @@ void setup() {
   advertising->setMinPreferred(0x06);
   advertising->setMaxPreferred(0x12);
   BLEDevice::startAdvertising();
+
+  notify_char->setValue("DISARMED");
+  delay(10);
+  notify_char->notify();
 }
 
 void loop() {
