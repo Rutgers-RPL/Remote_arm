@@ -4,7 +4,7 @@ Monorepo for the ESP32-based remote arming system. Uses an ESP32 as a master dev
 
 ## NOTE
 
-The "single_board" project is currently the most updated project here since it is the one actually being used. Ignore the information about the partition scheme and MAC Addresses when using the "single_board" project. The information about the USB to UART driver might still apply depending on your situation.
+Due to issues with connecting over BLE, the "single_board_bluetooth_classic" project is the most updated project here. Note that the bluetooth classic version of the project can only be used on Android. Ignore the information about the partition scheme and MAC Addresses when using the "single_board" project. The information about the USB to UART driver might still apply depending on your situation.
 
 ## Required Packages
 
