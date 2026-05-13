@@ -13,6 +13,9 @@
 #define CHANNEL_3 26
 #define CHANNEL_4 27
 
+const uint8_t channel_pins[] = {CHANNEL_1, CHANNEL_2, CHANNEL_3, CHANNEL_4};
+uint8_t channel_states[] = {LOW, LOW, LOW, LOW};
+
 BLECharacteristic* write_char;
 BLECharacteristic* notify_char;
 
@@ -28,8 +31,21 @@ void init_pins() {
   digitalWrite(CHANNEL_4, LOW);
 }
 
+void send_all_states() {
+  for (uint8_t i = 0; i < 4; i++) {
+    uint8_t channel_state = channel_states[i];
+    String state = channel_state == LOW ? "DISARMED" : "ARMED";
+    char channel = i + '1';
+    String msg = "B0_" + String(channel) + "_" + state;
+    notify_char->setValue(msg.c_str());
+    delay(10);
+    notify_char->notify();
+  }
+}
+
 void handle_pin_toggle(String val) {
-  char pin = val[3];
+  char channel = val[3];
+  uint8_t channel_index = channel - '1';
   String action = val.substring(5);
   uint8_t pin_mode;
 
@@ -41,24 +57,12 @@ void handle_pin_toggle(String val) {
     return;
   }
 
-  switch (pin) {
-    case '1':
-      digitalWrite(CHANNEL_1, pin_mode);
-      break;
-    case '2':
-      digitalWrite(CHANNEL_2, pin_mode);
-      break;
-    case '3':
-      digitalWrite(CHANNEL_3, pin_mode);
-      break;
-    case '4':
-      digitalWrite(CHANNEL_4, pin_mode);
-      break;
-    default:
-      break;
+  if (channel > '0' && channel < '5') {
+    digitalWrite(channel_pins[channel_index], pin_mode);
+    channel_states[channel_index] = pin_mode;
   }
 
-  String msg = "B0_" + String(pin) + "_" + action + "ED";
+  String msg = "B0_" + String(channel) + "_" + action + "ED";
   notify_char->setValue(msg.c_str());
   delay(10);
   notify_char->notify();
@@ -68,21 +72,21 @@ class WriteCharCallbacks : public BLECharacteristicCallbacks {
   void onWrite(BLECharacteristic* characteristic) {
     String val = characteristic->getValue();
 
-    Serial.println(val);
-
     if (val.length() < 2) return;
 
     if (val[1] == '0') {
       handle_pin_toggle(val);
+    } else if (val == "SYNC") {
+      send_all_states();
     }
   }
 };
 
 class ServerCallbacks : public BLEServerCallbacks {
   void onConnect(BLEServer* server) {
-    delay(500);
-    notify_char->setValue("DISARMED");
-    notify_char->notify();
+    // delay(500);
+    // notify_char->setValue("DISARMED");
+    // notify_char->notify();
   }
 
   void onDisconnect(BLEServer* server) {
