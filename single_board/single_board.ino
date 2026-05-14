@@ -8,13 +8,16 @@
 #define WRITE_CHARACTERISTIC_UUID "beb5483e-36e1-4688-b7f5-ea07361b26a8"
 #define NOTIFY_CHARACTERISTIC_UUID "498c599b-ad01-4148-8a6a-73c332854747"
 
-#define CHANNEL_1 14
-#define CHANNEL_2 25
-#define CHANNEL_3 26
-#define CHANNEL_4 27
+#define CHANNEL_1 1
+#define CHANNEL_2 2
+#define CHANNEL_3 10
+#define CHANNEL_4 3
+#define CHANNEL_5 7
+#define CHANNEL_6 5
+#define NUM_CHANNELS 6
 
-const uint8_t channel_pins[] = {CHANNEL_1, CHANNEL_2, CHANNEL_3, CHANNEL_4};
-uint8_t channel_states[] = {LOW, LOW, LOW, LOW};
+const uint8_t channel_pins[] = {CHANNEL_1, CHANNEL_2, CHANNEL_3, CHANNEL_4, CHANNEL_5, CHANNEL_6};
+uint8_t channel_states[] = {LOW, LOW, LOW, LOW, LOW, LOW};
 
 BLECharacteristic* write_char;
 BLECharacteristic* notify_char;
@@ -24,15 +27,19 @@ void init_pins() {
   pinMode(CHANNEL_2, OUTPUT);
   pinMode(CHANNEL_3, OUTPUT);
   pinMode(CHANNEL_4, OUTPUT);
+  pinMode(CHANNEL_5, OUTPUT);
+  pinMode(CHANNEL_6, OUTPUT);
 
   digitalWrite(CHANNEL_1, LOW);
   digitalWrite(CHANNEL_2, LOW);
   digitalWrite(CHANNEL_3, LOW);
   digitalWrite(CHANNEL_4, LOW);
+  digitalWrite(CHANNEL_5, LOW);
+  digitalWrite(CHANNEL_6, LOW);
 }
 
 void send_all_states() {
-  for (uint8_t i = 0; i < 4; i++) {
+  for (uint8_t i = 0; i < NUM_CHANNELS; i++) {
     uint8_t channel_state = channel_states[i];
     String state = channel_state == LOW ? "DISARMED" : "ARMED";
     char channel = i + '1';
@@ -57,7 +64,7 @@ void handle_pin_toggle(String val) {
     return;
   }
 
-  if (channel > '0' && channel < '5') {
+  if (channel > '0' && channel < ((NUM_CHANNELS + 1) + '0')) {
     digitalWrite(channel_pins[channel_index], pin_mode);
     channel_states[channel_index] = pin_mode;
   }
