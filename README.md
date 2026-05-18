@@ -16,7 +16,7 @@ In the Boards Manager, install the "esp32" boards package by "Espressif Systems"
 
 The size of the "booster_bay_master" sketch is too large for the default partition scheme of the ESP32. To solve this, follow these steps:
 
-1. First, go to `Tools` > `Board` > `esp32` and select "ESP32 Dev Module"
+1. First, go to `Tools` > `Board` > `esp32` and select "ESP32C3 Dev Module"
 2. Then, go to `Tools` > `Partition Scheme` and select "Huge App"
 
 After following the above steps, there shouldn't be any issue with deploying the "booster_bay_master" sketch.
