@@ -1,6 +1,6 @@
 # Remote Arm
 
-Monorepo for the ESP32-based remote arming system. Uses an ESP32 as a master device to receive commands over BLE and, if needed, relay commands to two other ESP32s using ESP-NOW.
+Monorepo for the ESP32-based remote arming system (Zeus). Allows connection to an ESP32 to arm/disarm up to 6 channels.
 
 ## NOTE
 
@@ -20,10 +20,6 @@ The size of the "booster_bay_master" sketch is too large for the default partiti
 2. Then, go to `Tools` > `Partition Scheme` and select "Huge App"
 
 After following the above steps, there shouldn't be any issue with deploying the "booster_bay_master" sketch.
-
-### MAC Addresses
-
-To communicate with the ignition bay and nose cone boards using ESP-NOW, the MAC addresses of these boards must be known. A board's MAC address can be found using the "get_mac_address" sketch, which will print that board's MAC address in normal text as well as in a hex array.
 
 ### USB to UART Driver
 
