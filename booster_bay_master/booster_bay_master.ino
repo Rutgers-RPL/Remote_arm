@@ -9,11 +9,11 @@
 #define NOTIFY_CHARACTERISTIC_UUID "498c599b-ad01-4148-8a6a-73c332854747"
 
 #define CHANNEL_1 1
-#define CHANNEL_2 2
-#define CHANNEL_3 3
-#define CHANNEL_4 4
-#define CHANNEL_5 5 
-#define CHANNEL_6 6
+#define CHANNEL_2 0
+#define CHANNEL_3 10
+#define CHANNEL_4 3
+#define CHANNEL_5 7 
+#define CHANNEL_6 5
 
 BLECharacteristic* write_char;
 BLECharacteristic* notify_char;
@@ -110,8 +110,11 @@ void setup() {
   advertising->setMinPreferred(0x06);
   advertising->setMaxPreferred(0x12);
   BLEDevice::startAdvertising();
+
+  pinMode(6, OUTPUT);
 }
 
 void loop() {
-  // No loop logic needed
+  digitalWrite(6, !digitalRead(6));
+  delay(250);
 }
