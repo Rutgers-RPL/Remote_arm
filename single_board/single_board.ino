@@ -9,12 +9,14 @@
 #define NOTIFY_CHARACTERISTIC_UUID "498c599b-ad01-4148-8a6a-73c332854747"
 
 #define CHANNEL_1 1
-#define CHANNEL_2 2
+#define CHANNEL_2 0
 #define CHANNEL_3 10
 #define CHANNEL_4 3
 #define CHANNEL_5 7
 #define CHANNEL_6 5
 #define NUM_CHANNELS 6
+
+#define VIN_PIN 4
 
 const uint8_t channel_pins[] = {CHANNEL_1, CHANNEL_2, CHANNEL_3, CHANNEL_4, CHANNEL_5, CHANNEL_6};
 uint8_t channel_states[] = {LOW, LOW, LOW, LOW, LOW, LOW};
@@ -48,6 +50,15 @@ void send_all_states() {
     delay(10);
     notify_char->notify();
   }
+}
+
+void send_voltage() {
+  uint16_t value = analogRead(VIN_PIN);
+  float actual = 0.0027473f * (float)value + 0.229834f; // https://www.desmos.com/calculator/lmwl7iq6hs
+  String msg = "V_" + String(actual);
+  notify_char->setValue(msg.c_str());
+  delay(10);
+  notify_char->notify();
 }
 
 void handle_pin_toggle(String val) {
@@ -85,15 +96,15 @@ class WriteCharCallbacks : public BLECharacteristicCallbacks {
       handle_pin_toggle(val);
     } else if (val == "SYNC") {
       send_all_states();
+    } else if (val == "VOLTAGE") {
+      send_voltage();
     }
-  }
+  } 
 };
 
 class ServerCallbacks : public BLEServerCallbacks {
   void onConnect(BLEServer* server) {
-    // delay(500);
-    // notify_char->setValue("DISARMED");
-    // notify_char->notify();
+    // No logic needed
   }
 
   void onDisconnect(BLEServer* server) {
@@ -106,7 +117,7 @@ void setup() {
 
   Serial.begin(115200);
 
-  BLEDevice::init("RRPL Rocket");
+  BLEDevice::init("RRPL ___"); // Set the blank to wherever the board is being placed
 
   BLEServer* server = BLEDevice::createServer();
   BLEService* service = server->createService(SERVICE_UUID);
